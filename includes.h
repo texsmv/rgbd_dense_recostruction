@@ -82,4 +82,7 @@ void printGLMatrix(mat4 m);
 
 double AvgError(const std::vector<Eigen::Vector3d> &s, const std::vector<Eigen::Vector3d> &t);
 
+
+
+
 #endif // INCLUDES_H
