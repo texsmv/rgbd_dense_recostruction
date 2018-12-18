@@ -134,7 +134,7 @@ void Image::FillPointCloudData()
             int b = RGB_frame.at<cv::Vec3b>(v,u)[0];
             int g = RGB_frame.at<cv::Vec3b>(v,u)[1];
             int r = RGB_frame.at<cv::Vec3b>(v,u)[2];
-            
+
             Colors[i] = vec3(r,g,b) / 255.0f;
         }
 
