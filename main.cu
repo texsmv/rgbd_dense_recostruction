@@ -25,7 +25,6 @@ usar temporalmente sudo ./app
 //#define intrinsics Cam_Defaults
 #define intrinsics Cam_Sturm2012_fr1
 
-
 // Seleccionamos los frames que vamos a procesar
 float speed = 0.01f;
 float zFactor = 1.0f;
@@ -241,7 +240,7 @@ int main(int argc, char** argv){
     cout << from << to <<endl;
 
     // Lectura y Procesamiento de Datos con OpenCV
-    std::srand( unsigned( std::time(0) ));
+    std::srand( unsigned( NULL ));
     //Parte del calculo de OpenCV
     DataSet myDataSet(DATABASE_NAME);
 

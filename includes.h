@@ -27,10 +27,11 @@ using std::cerr;
 #include <glm/gtc/matrix_transform.hpp>
 
 // Los dos defines de abajo me permiten imprimir directamente las matrices de glm
-#define GLM_ENABLE_EXPERIMENTAL
+// #define GLM_ENABLE_EXPERIMENTAL
+// #define GLM_FORCE_CUDA
 
-#include <glm/gtx/string_cast.hpp>
-#include <glm/ext.hpp>
+// #include <glm/gtx/string_cast.hpp>
+// #include <glm/ext.hpp>
 
 typedef glm::vec2 vec2;
 typedef glm::vec3 vec3;

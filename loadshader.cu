@@ -31,7 +31,7 @@ void uniformRegister(GLint var,GLuint shaderID,const char * string){
 }
 void printMatrix(mat4 matrix){
     for (int i = 0; i < 4; i++){
-        cout << glm::to_string(vec4(matrix[i])) << endl;
+        // cout << glm::to_string(vec4(matrix[i])) << endl;
     }
 }
 

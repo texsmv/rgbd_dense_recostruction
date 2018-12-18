@@ -6,6 +6,8 @@
 #include <vector>
 #include <queue>
 
+#include "funciones_cuda.h"
+
 using namespace std;
 
 /**Algunos Typedefs**/
