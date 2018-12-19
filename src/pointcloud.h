@@ -21,6 +21,14 @@ public:
     vector<vec3> Normals;
     vector<vec3> Colors;
 
+    float* puntos;
+    float* colores;
+
+    float* d_puntos;
+    float* d_colores;
+
+
+
     int NumberOfPixels();
 };
 

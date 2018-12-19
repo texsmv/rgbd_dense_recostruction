@@ -23,7 +23,7 @@ VolumeIntegrator::VolumeIntegrator(Odometry &source)
     for(int i = 1; i < n-1  ; i++)
         Transformations[i] = Transformations[i-1] * source.getTransformation(i);
         //Transformations[i] = source.getTransformation(i);
-
+        
     //Insertamos una matrix identidad al principio de nuestras transformaciones
     //para emparejar nuestros vectores y hacer bucles mas facil
     Transformations.insert(Transformations.begin(),Eigen::Matrix4d::Identity());

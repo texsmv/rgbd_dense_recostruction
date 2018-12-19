@@ -27,6 +27,9 @@ Image::Image(DataSet * _dataset, int frame_number, int intrinsics){
     std::vector<vec3> &Points = point_cloud->Points;
     std::vector<vec3> &Normals = point_cloud->Normals;
     std::vector<vec3> &Colors = point_cloud->Colors;
+
+    point_cloud->puntos = vec3_array<float>(pixelCount);
+
     Points.resize(pixelCount);
     Normals.resize(pixelCount);
     Colors.resize(pixelCount);
@@ -107,24 +110,58 @@ void Image::FillPointCloudData()
 
     //Estimamos las Coordenadas Locales para cada pixel en el frame
     uint16_t *pSource = (uint16_t*) DEPTH_frame.data;
+    point_cloud->d_puntos = cuda_array<float>(width * height);
 
+    uint16_t *d_pSource;
+    d_pSource = cuda_array<uint16_t>(height * width);
+    // cout<<"asda"<<endl;
+    cuda_H2D<uint16_t>(pSource, d_pSource, height * width);
+    // cout<<"asda"<<endl;
+
+    cudaDeviceSynchronize();
+
+    cuda_H2D<float>(point_cloud->puntos, point_cloud->d_puntos, height * width);
+    // cout<<"asda"<<endl;
+    cudaDeviceSynchronize();
+
+    dim3 grid = dim3(16, 16, 1);
+    dim3 block = dim3(16, 16, 1);
+
+    fillPoints<<<grid, block>>>(d_pSource, point_cloud->d_puntos, Intrinsics->depthFactor, Intrinsics->cx, Intrinsics->cy, Intrinsics->fx, Intrinsics->fy, height, width);
+    // cout<<"asda"<<endl;
+    cudaDeviceSynchronize();
+
+    cuda_D2H<float>(point_cloud->d_puntos, point_cloud->puntos, height * width);
+    cudaDeviceSynchronize();
     //Pasamos de coordenadas (u,v,s) en 2D a (x,y,z) Coordenadas Locales
+    int i;
     for(int v = 0; v < height; v++)
         for(int u = 0; u < width; u++){
-            uint16_t value = (uint16_t) (*(pSource)); // Leyendo los valores para 16 Bits
-            int i = u + v * width; //Valor para iterar sobre nuestro FlatVector
-            //int key = cv::waitKey(5000);
-            //cout << i<<": "<< value << endl;
-            if(value != 0){
-                Points[i].z = value / Intrinsics->depthFactor ; // Valor en Z
-                Points[i].x = (u - Intrinsics->cx) * Points[i].z / Intrinsics->fx; // Valor en X
-                Points[i].y = (v - Intrinsics->cy) * Points[i].z / Intrinsics->fy; // Valor en X
-            }else{
-                Points[i].x = 0;
-                Points[i].y = 0;
-                Points[i].z = 0;
-            }
-            pSource++;
+            // uint16_t value = (uint16_t) (*(pSource)); // Leyendo los valores para 16 Bits
+            // int i = u + v * width; //Valor para iterar sobre nuestro FlatVector
+            // //int key = cv::waitKey(5000);
+            // //cout << i<<": "<< value << endl;
+            // if(value != 0){
+            //     at_vec3(point_cloud->puntos, i, 2) = value / Intrinsics->depthFactor;
+            //     at_vec3(point_cloud->puntos, i, 0) = (u - Intrinsics->cx) * Points[i].z / Intrinsics->fx;
+            //     at_vec3(point_cloud->puntos, i, 1) = (v - Intrinsics->cy) * Points[i].z / Intrinsics->fy;
+            //     Points[i].z = value / Intrinsics->depthFactor ; // Valor en Z
+            //     Points[i].x = (u - Intrinsics->cx) * Points[i].z / Intrinsics->fx; // Valor en X
+            //     Points[i].y = (v - Intrinsics->cy) * Points[i].z / Intrinsics->fy; // Valor en X
+            // }
+            // else{
+            //     at_vec3(point_cloud->puntos, i, 2) = 0;
+            //     at_vec3(point_cloud->puntos, i, 0) = 0;
+            //     at_vec3(point_cloud->puntos, i, 1) = 0;
+            //     Points[i].x = 0;
+            //     Points[i].y = 0;
+            //     Points[i].z = 0;
+            // }
+            // pSource++;
+            i = u + v * width;
+            Points[i].x = at_vec3(point_cloud->puntos, i, 0);
+            Points[i].y = at_vec3(point_cloud->puntos, i, 1);
+            Points[i].z = at_vec3(point_cloud->puntos, i, 2);
         }
     // Registramos los colores
     for(int v = 0; v < height; v++)

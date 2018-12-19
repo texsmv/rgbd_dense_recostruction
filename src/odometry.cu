@@ -85,33 +85,7 @@ Eigen::Matrix4d ComputeOdometry(Image &source, Image &target)
 
     cout << "Total number of Inliers: "  << coord_s.size() << endl;
 
-    // ALGORITMO ICP
-    // 1era Version
-
-    /**
-    Eigen::Matrix4d Tacc = Eigen::Matrix4d::Identity(); // Aqui almacenaremos los resultados
-
-    //Eigen::Matrix4d T;
-    FOR(it,1){
-        Eigen::Matrix4d T = QuickTransformation(coord_s,coord_t);
-        //Tacc = T * Tacc;
-        //cout << "Transformacion:" << endl << T << endl;
-        //cout << "Transformacion Acc:" << endl << Tacc << endl;
-        //FOR(i,5){
-        //    printEigenVector(coord_s[i]);printEigenVector(coord_t[i]);cout << "======================\n";
-        //}
-        //double error = AvgError(coord_s,coord_t);
-        //cout << "Error Promedio: " << error << endl;
-
-        // Actualizamos los valores para la siguiente iteracion
-        FOR(i,coord_t.size()){
-            Eigen::Vector4d tmp1 = T * Eigen::Vector4d(coord_t[i](0),coord_t[i](1),coord_t[i](2),1.0);
-            Eigen::Vector3d tmp2 = Eigen::Vector3d(tmp1(0),tmp1(1),tmp1(2));
-            coord_t[i] = tmp2;
-        }
-    }
-    **/
-
+    
 
     // Alineando de 3 en 3 puntos aleatoriamente
     std::vector<int> indices(coord_s.size());

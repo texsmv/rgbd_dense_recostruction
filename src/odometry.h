@@ -4,6 +4,7 @@
 
 #include "includes.h"
 #include "image.h"
+#include "funciones_cuda.h"
 
 class Odometry
 {
