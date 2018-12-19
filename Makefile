@@ -4,20 +4,20 @@ FLAGS = -leasy3d -lGL -lglut -lGLEW -lGLU -lopencv_core -lopencv_imgproc -lopenc
 # visualization = volumeintegrator.o
 # geometry = pointcloud.o odometry.o addfunctions.o
 # objects = image.o dataset.o camera.o loadshader.o main.o
-objects = camera.o  odometry.o image.o dataset.o pointcloud.o funciones.o loadshader.o volumeintegrator.o funciones_cuda.o main.o
+objects = camera.o  odometry.o image.o dataset.o pointcloud.o funciones.o loadshader.o volumeintegrator.o main.o
 #
 # %.o: %.cpp $(DEPS)
 # 	g++ $(FLAGS) -c -o $@ $<
 
-%.o: src/%.cu  $(DEPS)
-	nvcc $(FLAGS) -c -o $@ $<
+%.o: src/%.cpp  $(DEPS)
+	g++ $(FLAGS) -c -o $@ $<
 
-%.o: %.cu  $(DEPS)
-	nvcc $(FLAGS) -c -o $@ $<
+%.o: %.cpp  $(DEPS)
+	g++ $(FLAGS) -c -o $@ $<
 
 
 all: $(objects)
-	nvcc  $(objects) -o app $(FLAGS)
+	g++  $(objects) -o app $(FLAGS)
 	# %.o: %.cu $(DEPS)
 	# 	nvcc $(FLAGS) -c -o $@ $<
 	# funciones_cuda.o:

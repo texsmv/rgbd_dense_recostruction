@@ -19,8 +19,6 @@ using std::vector;
 using std::fstream;
 using std::cerr;
 
-
-
 /**OPENGL LIB**/
 #include <GL/glew.h>
 #include <GL/freeglut.h>
@@ -29,11 +27,10 @@ using std::cerr;
 #include <glm/gtc/matrix_transform.hpp>
 
 // Los dos defines de abajo me permiten imprimir directamente las matrices de glm
-// #define GLM_ENABLE_EXPERIMENTAL
-// #define GLM_FORCE_CUDA
+#define GLM_ENABLE_EXPERIMENTAL
 
-// #include <glm/gtx/string_cast.hpp>
-// #include <glm/ext.hpp>
+#include <glm/gtx/string_cast.hpp>
+#include <glm/ext.hpp>
 
 typedef glm::vec2 vec2;
 typedef glm::vec3 vec3;
@@ -56,8 +53,6 @@ typedef glm::vec4 vec4;
 #include "opencv2/cudaimgproc.hpp"
 #include "opencv2/cudafeatures2d.hpp"
 
-
-using namespace cv;
 //Los parametros predefinidos para los datos
 #define FrameWidth 640
 #define FrameHeight 480
@@ -88,8 +83,5 @@ void printGLVector(vec3 s);
 void printGLMatrix(mat4 m);
 
 double AvgError(const std::vector<Eigen::Vector3d> &s, const std::vector<Eigen::Vector3d> &t);
-
-
-
 
 #endif // INCLUDES_H

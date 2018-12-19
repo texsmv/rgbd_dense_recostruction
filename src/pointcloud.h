@@ -3,7 +3,7 @@
 
 #include "includes.h"
 
-
+// Solo es un contenedor para las Nubes de Puntos
 class PointCloud
 {
 private:
@@ -11,8 +11,7 @@ private:
 public:
     PointCloud();
     ~PointCloud(){}
-
-
+    // Funciones a realizarse dentro del constructor, donde se estiman todos los datos
     void EstimatePoints();
     void EstimateNormals();
     void EstimateColors();
@@ -20,9 +19,6 @@ public:
     vector<vec3> Points;
     vector<vec3> Normals;
     vector<vec3> Colors;
-
-
-
 
     int NumberOfPixels();
 };

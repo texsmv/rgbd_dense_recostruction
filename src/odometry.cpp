@@ -41,8 +41,6 @@ Eigen::Matrix4d ComputeOdometry(Image &source, Image &target)
     cv::Mat source_Mat = source.get_RGB_Mat();
     cv::Mat target_Mat = target.get_RGB_Mat();
 
-
-
     std::vector<cv::KeyPoint> keypoints_s;
     std::vector<cv::KeyPoint> keypoints_t;
     std::vector<cv::DMatch> matches = computeFeatureMatches(source_Mat,keypoints_s,target_Mat,keypoints_t);
@@ -87,6 +85,32 @@ Eigen::Matrix4d ComputeOdometry(Image &source, Image &target)
 
     cout << "Total number of Inliers: "  << coord_s.size() << endl;
 
+    // ALGORITMO ICP
+    // 1era Version
+
+    /**
+    Eigen::Matrix4d Tacc = Eigen::Matrix4d::Identity(); // Aqui almacenaremos los resultados
+
+    //Eigen::Matrix4d T;
+    FOR(it,1){
+        Eigen::Matrix4d T = QuickTransformation(coord_s,coord_t);
+        //Tacc = T * Tacc;
+        //cout << "Transformacion:" << endl << T << endl;
+        //cout << "Transformacion Acc:" << endl << Tacc << endl;
+        //FOR(i,5){
+        //    printEigenVector(coord_s[i]);printEigenVector(coord_t[i]);cout << "======================\n";
+        //}
+        //double error = AvgError(coord_s,coord_t);
+        //cout << "Error Promedio: " << error << endl;
+
+        // Actualizamos los valores para la siguiente iteracion
+        FOR(i,coord_t.size()){
+            Eigen::Vector4d tmp1 = T * Eigen::Vector4d(coord_t[i](0),coord_t[i](1),coord_t[i](2),1.0);
+            Eigen::Vector3d tmp2 = Eigen::Vector3d(tmp1(0),tmp1(1),tmp1(2));
+            coord_t[i] = tmp2;
+        }
+    }
+    **/
 
 
     // Alineando de 3 en 3 puntos aleatoriamente
@@ -165,7 +189,6 @@ std::vector<cv::DMatch> computeFeatureMatches(const cv::Mat &source,std::vector<
     //cv::ORB orb; //Toma por defecto 500 features // declaracion con opencv2
 
     /**OPENCV 3 ORB FEATURE DECLARATION**/
-
     cv::cuda::GpuMat source_d;
     cv::cuda::GpuMat target_d;
 
@@ -190,7 +213,7 @@ std::vector<cv::DMatch> computeFeatureMatches(const cv::Mat &source,std::vector<
     cout<<target.rows<<endl;
     cout<<target_d.rows<<endl;
     // cv::Ptr<cv::FeatureDetector> orb = cuda::ORB::create(); // al crearlo con opencv3 orb es un puntero cambiar sus llamadas para  usar -> en ves de puntos
-    Ptr<cuda::ORB> orb = cuda::ORB::create();
+    cv::Ptr<cv::cuda::ORB> orb = cv::cuda::ORB::create();
 
     cout<<"adas"<<endl;
     orb->detect(source_d,keypoints_s);
@@ -218,25 +241,25 @@ std::vector<cv::DMatch> computeFeatureMatches(const cv::Mat &source,std::vector<
 
     // Feature Matching using FLANN (Kd-Trees)
     // Referirse a la documentacion de OpenCV
-    cv::FlannBasedMatcher matcher(new cv::flann::LshIndexParams(6,12,1));
-    // cv::Ptr<cv::cuda::DescriptorMatcher> matcher = cv::cuda::DescriptorMatcher::createBFMatcher(cv::NORM_HAMMING);
+    // cv::FlannBasedMatcher matcher(new cv::flann::LshIndexParams(6,12,1));
+    cv::Ptr<cv::cuda::DescriptorMatcher> matcher = cv::cuda::DescriptorMatcher::createBFMatcher(cv::NORM_HAMMING);
 
-    // std::vector<std::vector<cv::DMatch> > knn_matches;
+    std::vector<std::vector<cv::DMatch> > knn_matches;
 
-    // matcher->knnMatch(descriptor_s_d, descriptor_t_d, knn_matches, 2);
+    matcher->knnMatch(descriptor_s_d, descriptor_t_d, knn_matches, 2);
 
     std::vector<cv::DMatch> matches;
     //
-    // for(std::vector<std::vector<cv::DMatch> >::const_iterator it = knn_matches.begin(); it != knn_matches.end(); ++it) {
-    //     if(it->size() > 1 && (*it)[0].distance/(*it)[1].distance < 0.8) {
-    //         matches.push_back((*it)[0]);
-    //     }
-    // }
+    for(std::vector<std::vector<cv::DMatch> >::const_iterator it = knn_matches.begin(); it != knn_matches.end(); ++it) {
+        if(it->size() > 1 && (*it)[0].distance/(*it)[1].distance < 0.8) {
+            matches.push_back((*it)[0]);
+        }
+    }
 
 
 
     // cout<<"adasasas"<<endl;
-    matcher.match(descriptor_s,descriptor_t,matches);
+    // matcher.match(descriptor_s,descriptor_t,matches);
     cout<<"adasasaass"<<endl;
 
     /**
@@ -249,11 +272,8 @@ std::vector<cv::DMatch> computeFeatureMatches(const cv::Mat &source,std::vector<
       }
     printf("-- Max dist : %f \n", max_dist );
     printf("-- Min dist : %f \n", min_dist );
-
-
     //Drawing the good matches
     cv::Mat img_matches;
-
      //No podemos descartar los matches porque es posible que cuando hagamos lanzemos el error
       // de Asercion donde el indice del match no puede ser mayor que el vector que almacena los matchs
     std::vector<cv::DMatch> good_matches;
@@ -317,12 +337,7 @@ Eigen::Matrix4d QuickTransformation(const std::vector<Eigen::Vector3d> &p,const 
     Eigen::Matrix4d transformation = Eigen::Matrix4d::Identity();
     for(int i = 0; i < 3;i++)
         for(int j = 0; j < 3; j++)
-            //return Eigen::Matrix4d::Identity(); // Para hacer pruebas
-
-    // Filtrado de Puntos
-    // Para el ICP(Point-to-Point) debemos verificar que los matches realmente tienen buena correspondencia
-    // Aprovechamos los vectores pixelMatch
-    transformation(i,j) = R(i,j);
+            transformation(i,j) = R(i,j);
     for(int i = 0 ; i < 3; i++)
         transformation(i,3) = t(i);
     //cout << "Matriz de Transformacion(Target-->Source)" << endl << transformation << endl;

@@ -240,7 +240,7 @@ int main(int argc, char** argv){
     cout << from << to <<endl;
 
     // Lectura y Procesamiento de Datos con OpenCV
-    std::srand( 0);
+    std::srand( unsigned( std::time(0) ));
     //Parte del calculo de OpenCV
     DataSet myDataSet(DATABASE_NAME);
 
@@ -254,21 +254,21 @@ int main(int argc, char** argv){
         voImages.push_back(Image(&myDataSet,i,intrinsics));
     }
 
-    Odometry odometry(&voImages);
-    odometry.CalcTransformations();
+    //Odometry odometry(&voImages);
+    //odometry.CalcTransformations();
 
-    integrator = new VolumeIntegrator(odometry);
-    integrator->AlignClouds();
+    //integrator = new VolumeIntegrator(odometry);
+    //integrator->AlignClouds();
     //integrator->PrintInfo();
 
-    integrator->GenerateGLGeometry(cubes,16);
+    //integrator->GenerateGLGeometry(cubes,16);
 
 
 
 
-    // integrator = new VolumeIntegrator(&myDataSet,from,to,intrinsics);
+     integrator = new VolumeIntegrator(&myDataSet,from,to,intrinsics);
     //
-    // integrator->GenerateGLGeometry(cubes,14);
+     integrator->GenerateGLGeometry(cubes,14);
 
 
 
