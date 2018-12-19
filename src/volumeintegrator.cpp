@@ -208,6 +208,21 @@ vec3* VolumeIntegrator::normal_data()
     return tsdf->NormalData();
 }
 
+std::vector<vec3> VolumeIntegrator::point_vector()
+{
+    return tsdf->PointVector();
+}
+
+std::vector<vec3> VolumeIntegrator::color_vector()
+{
+    return tsdf->ColorVector();
+}
+
+std::vector<vec3> VolumeIntegrator::normal_vector()
+{
+    return tsdf->NormalVector();
+}
+
 void VolumeIntegrator::PrintInfo()
 {
 

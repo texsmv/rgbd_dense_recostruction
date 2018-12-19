@@ -23,7 +23,7 @@ float RandomFloat(float min, float max){
 }
 **/
 
-enum VisualMode{lines,cubes};
+enum VisualMode{lines,cubes,points};
 
 // Implementacion para Visualizar octree usando OpenGL
 // Debe generar la geometría adecuada para ser visualizada en 3D
@@ -46,6 +46,9 @@ public:
     vec3* PointData() { return voGLPoints.data(); }
     vec3* ColorData() { return voGLColors.data(); }
     vec3* NormalData(){ return voGLNormals.data(); }
+    std::vector<vec3> PointVector() { return voGLPoints; }
+    std::vector<vec3> ColorVector() { return voGLColors; }
+    std::vector<vec3> NormalVector(){ return voGLNormals; }
 
     int TotalNoPoints(){ return noPoints; }
 
@@ -75,6 +78,15 @@ public:
                 CubesFromBoundingBox(boxes[i]);
                 eVector3f t = boxes[i].color;
                 vec3 c = vec3(t(0),t(1),t(2));
+                //cout << i << " Box Color: " << c.x << " " << c.y<< " " << c.z<< endl;
+            }
+
+            break;
+        case points:
+            for_i(boxes.size()){
+                PointsFromBoundingBox(boxes[i]);
+                //eVector3f t = boxes[i].color;
+                //vec3 c = vec3(t(0),t(1),t(2));
                 //cout << i << " Box Color: " << c.x << " " << c.y<< " " << c.z<< endl;
             }
 
@@ -179,6 +191,19 @@ private:
             voGLColors.push_back(c);
     }
 
+    //Almacenamos los puntos para generar la malla
+    void PointsFromBoundingBox(BoundingBox box){
+
+        Eigen::Vector3f center = (box.min + box.max)/2;
+
+        voGLPoints.push_back(vec3(center(0),center(1),center(2)));
+
+        noPoints += 1;
+
+        eVector3f t = box.color;
+
+        voGLColors.push_back(vec3(t(0),t(1),t(2)));
+    }
 };
 
 

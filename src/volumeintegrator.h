@@ -32,6 +32,9 @@ public:
     vec3* point_data();
     vec3* color_data();
     vec3* normal_data();
+    std::vector<vec3> point_vector();
+    std::vector<vec3> color_vector();
+    std::vector<vec3> normal_vector();
 
     void PrintInfo();
 

@@ -1,15 +1,3 @@
-/**
-Archivo Main!! ---> la carpeta tiene Git
-La forma en como compilar deberia ser la q sigue
-g++ main.cpp -o main && ./main
-
-export LD_LIBRARY_PATH=/home/maxito911/Qt/5.9.1/gcc_64/lib:$LD_LIBRARY_PATH
-
-make && ./app FrameInicial FrameFinal
-
-usar temporalmente sudo ./app
-**/
-
 #include "src/includes.h"
 #include "src/loadshader.h"
 #include "src/dataset.h"
@@ -249,10 +237,10 @@ int main(int argc, char** argv){
 
 
     //Forma 1 (funciona)
-    std::vector<Image> voImages;
+    /*std::vector<Image> voImages;
     for(int i = from; i  <= to ;i++){
         voImages.push_back(Image(&myDataSet,i,intrinsics));
-    }
+    }*/
 
     //Odometry odometry(&voImages);
     //odometry.CalcTransformations();
@@ -264,37 +252,113 @@ int main(int argc, char** argv){
     //integrator->GenerateGLGeometry(cubes,16);
 
 
+    int mode = points;
 
-
-     integrator = new VolumeIntegrator(&myDataSet,from,to,intrinsics);
-    //
-     integrator->GenerateGLGeometry(cubes,14);
-
+    integrator = new VolumeIntegrator(&myDataSet,from,to,intrinsics);
+    
+    integrator->GenerateGLGeometry(mode,14);
 
 
     // OpenGL
+    if (mode != points){
+        glutInit(&argc,argv);
 
-    glutInit(&argc,argv);
+        glewExperimental = GL_TRUE;
 
-    glewExperimental = GL_TRUE;
+        glutInitDisplayMode( GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
+        glutInitWindowSize(windowDIM,windowDIM);
+        glutInitContextVersion(4,3);
+        glutInitContextProfile(GLUT_CORE_PROFILE);
+        glutCreateWindow("Aligned Point Cloud");
+        if(glewInit()){
+            std::cerr << "No se pudo inicializar GLEW" << endl;
+            exit(EXIT_FAILURE);
+        }
 
-    glutInitDisplayMode( GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
-    glutInitWindowSize(windowDIM,windowDIM);
-    glutInitContextVersion(4,3);
-    glutInitContextProfile(GLUT_CORE_PROFILE);
-    glutCreateWindow("Aligned Point Cloud");
-    if(glewInit()){
-        std::cerr << "No se pudo inicializar GLEW" << endl;
-        exit(EXIT_FAILURE);
+        Init();
+
+        glutDisplayFunc(display);
+        glutKeyboardFunc(keyboard);
+        glutMouseFunc(mouseCallback);
+        glutPassiveMotionFunc(mouseMotion);
+
+        glutMainLoop();
     }
 
-    Init();
+    else{
+        std::vector<vec3> Points(integrator->point_vector());
+        std::vector<vec3> Colors(integrator->color_vector());
 
-    glutDisplayFunc(display);
-    glutKeyboardFunc(keyboard);
-    glutMouseFunc(mouseCallback);
-    glutPassiveMotionFunc(mouseMotion);
+        delete integrator;
 
-    glutMainLoop();
+        pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZRGB>);
+        cloud->width = Points.size();
+        cloud->height = 1;
+        cloud->points.resize(cloud->width * cloud->height);
 
+        for_i(cloud->points.size())
+        {
+            cloud->points[i].x = Points[i].x; cloud->points[i].y = Points[i].y; cloud->points[i].z = Points[i].z;
+            cloud->points[i].r = Colors[i].x*255.0f; cloud->points[i].g = Colors[i].y*255.0f; cloud->points[i].b = Colors[i].z*255.0f; 
+        }
+
+        pcl::io::savePCDFileBinary("pointcloud.pcd", *cloud);
+
+        // Normal estimation*
+        pcl::NormalEstimation<pcl::PointXYZRGB, pcl::Normal> n;
+        pcl::PointCloud<pcl::Normal>::Ptr normals (new pcl::PointCloud<pcl::Normal>);
+        pcl::search::KdTree<pcl::PointXYZRGB>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZRGB>);
+        tree->setInputCloud (cloud);
+        n.setInputCloud (cloud);
+        n.setSearchMethod (tree);
+        n.setKSearch (20);
+        n.compute (*normals);
+        //* normals should not contain the point normals + surface curvatures
+
+        // Concatenate the XYZ and normal fields*
+        pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr cloud_with_normals (new pcl::PointCloud<pcl::PointXYZRGBNormal>);
+        pcl::concatenateFields (*cloud, *normals, *cloud_with_normals);
+        //* cloud_with_normals = cloud + normals
+
+        // Create search tree*
+        pcl::search::KdTree<pcl::PointXYZRGBNormal>::Ptr tree2 (new pcl::search::KdTree<pcl::PointXYZRGBNormal>);
+        tree2->setInputCloud (cloud_with_normals);
+
+        // Initialize objects
+        pcl::GreedyProjectionTriangulation<pcl::PointXYZRGBNormal> gp3;
+        pcl::PolygonMesh triangles;
+
+        // Set the maximum distance between connected points (maximum edge length)
+        gp3.setSearchRadius (0.025);
+
+        // Set typical values for the parameters
+        gp3.setMu (2.5);
+        gp3.setMaximumNearestNeighbors (250);
+        gp3.setMaximumSurfaceAngle(M_PI); // 180 degrees
+        gp3.setMinimumAngle(M_PI/18); // 10 degrees
+        gp3.setMaximumAngle(2*M_PI/3); // 120 degrees
+        gp3.setNormalConsistency(false);
+
+        // Get result
+        gp3.setInputCloud (cloud_with_normals);
+        gp3.setSearchMethod (tree2);
+        gp3.reconstruct (triangles);
+
+        // Additional vertex information
+        std::vector<int> parts = gp3.getPartIDs();
+        std::vector<int> states = gp3.getPointStates();
+
+        boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer(new pcl::visualization::PCLVisualizer("Reconstruccion 3D"));
+
+        viewer->addPolygonMesh(triangles, "reconstruccion");
+        //viewer->resetCameraViewpoint("reconstruccion");
+        while(!viewer->wasStopped()){
+            viewer->spinOnce(100);
+        }
+
+        pcl::io::saveVTKFile("mesh.vtk", triangles);
+
+        // Finish
+        return (0);
+    }
 }
