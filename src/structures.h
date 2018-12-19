@@ -1,6 +1,8 @@
 #ifndef STRUCTURES_H
 #define STRUCTURES_H
 
+
+
 #include "stdio.h"
 #include "stdlib.h"
 #include <curand.h>
@@ -44,7 +46,7 @@ T* cuda_array(int n){
 template <class T>
 void cuda_H2D(T* h_arr, T* d_arr, int n){
   size_t tam = n * sizeof(T);
-  CHECK(cudaMemcpy(d_arr, h_arr, tam, cudaMemcpyHostToDevice));
+  CHECK(cwudaMemcpy(d_arr, h_arr, tam, cudaMemcpyHostToDevice));
 }
 
 // template to copy array from device to host

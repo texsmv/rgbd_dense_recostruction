@@ -41,6 +41,8 @@ Eigen::Matrix4d ComputeOdometry(Image &source, Image &target)
     cv::Mat source_Mat = source.get_RGB_Mat();
     cv::Mat target_Mat = target.get_RGB_Mat();
 
+
+
     std::vector<cv::KeyPoint> keypoints_s;
     std::vector<cv::KeyPoint> keypoints_t;
     std::vector<cv::DMatch> matches = computeFeatureMatches(source_Mat,keypoints_s,target_Mat,keypoints_t);
@@ -85,7 +87,7 @@ Eigen::Matrix4d ComputeOdometry(Image &source, Image &target)
 
     cout << "Total number of Inliers: "  << coord_s.size() << endl;
 
-    
+
 
     // Alineando de 3 en 3 puntos aleatoriamente
     std::vector<int> indices(coord_s.size());
@@ -163,23 +165,79 @@ std::vector<cv::DMatch> computeFeatureMatches(const cv::Mat &source,std::vector<
     //cv::ORB orb; //Toma por defecto 500 features // declaracion con opencv2
 
     /**OPENCV 3 ORB FEATURE DECLARATION**/
-    cv::Ptr<cv::FeatureDetector> orb = cv::ORB::create(); // al crearlo con opencv3 orb es un puntero cambiar sus llamadas para  usar -> en ves de puntos
 
-    orb->detect(source,keypoints_s);
-    orb->detect(target,keypoints_t);
+    cv::cuda::GpuMat source_d;
+    cv::cuda::GpuMat target_d;
 
+    cv::cuda::GpuMat source_d_c;
+    cv::cuda::GpuMat target_d_c;
+
+
+    cv::cuda::GpuMat descriptor_s_d;
+    cv::cuda::GpuMat descriptor_t_d;
     cv::Mat descriptor_s;
     cv::Mat descriptor_t;
 
-    orb->compute(source,keypoints_s,descriptor_s);
-    orb->compute(target,keypoints_t,descriptor_t);
+
+    source_d_c.upload(source);
+    target_d_c.upload(target);
+
+    cv::cuda::cvtColor(source_d_c, source_d, CV_BGR2GRAY);
+    cv::cuda::cvtColor(target_d_c, target_d, CV_BGR2GRAY);
+
+    cout<<source.rows<<endl;
+    cout<<source_d.rows<<endl;
+    cout<<target.rows<<endl;
+    cout<<target_d.rows<<endl;
+    // cv::Ptr<cv::FeatureDetector> orb = cuda::ORB::create(); // al crearlo con opencv3 orb es un puntero cambiar sus llamadas para  usar -> en ves de puntos
+    Ptr<cuda::ORB> orb = cuda::ORB::create();
+
+    cout<<"adas"<<endl;
+    orb->detect(source_d,keypoints_s);
+    orb->detect(target_d,keypoints_t);
+
+    // orb->detect(source,keypoints_s);
+    // orb->detect(target,keypoints_t);
+
+
+    cout<<"adas"<<endl;
+
+    orb->compute(source_d,keypoints_s,descriptor_s_d);
+    orb->compute(target_d,keypoints_t,descriptor_t_d);
+
+    // orb->compute(source,keypoints_s,descriptor_s_d);
+    // orb->compute(target,keypoints_t,descriptor_t_d);
+
+    // orb->detectAndCompute(source_d, noArray(), keypoints_s,descriptor_s_d, true);
+    // orb->detectAndCompute(target_d, noArray(), keypoints_t,descriptor_t_d, true);
+    cout<<"adas"<<endl;
+    descriptor_s_d.download(descriptor_s);
+    descriptor_t_d.download(descriptor_t);
+
+    cout<<"adas"<<endl;
 
     // Feature Matching using FLANN (Kd-Trees)
     // Referirse a la documentacion de OpenCV
     cv::FlannBasedMatcher matcher(new cv::flann::LshIndexParams(6,12,1));
-    std::vector<cv::DMatch> matches;
-    matcher.match(descriptor_s,descriptor_t,matches);
+    // cv::Ptr<cv::cuda::DescriptorMatcher> matcher = cv::cuda::DescriptorMatcher::createBFMatcher(cv::NORM_HAMMING);
 
+    // std::vector<std::vector<cv::DMatch> > knn_matches;
+
+    // matcher->knnMatch(descriptor_s_d, descriptor_t_d, knn_matches, 2);
+
+    std::vector<cv::DMatch> matches;
+    //
+    // for(std::vector<std::vector<cv::DMatch> >::const_iterator it = knn_matches.begin(); it != knn_matches.end(); ++it) {
+    //     if(it->size() > 1 && (*it)[0].distance/(*it)[1].distance < 0.8) {
+    //         matches.push_back((*it)[0]);
+    //     }
+    // }
+
+
+
+    // cout<<"adasasas"<<endl;
+    matcher.match(descriptor_s,descriptor_t,matches);
+    cout<<"adasasaass"<<endl;
 
     /**
     //Calculamos los valores maximos y minimos

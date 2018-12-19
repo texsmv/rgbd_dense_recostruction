@@ -19,6 +19,8 @@ using std::vector;
 using std::fstream;
 using std::cerr;
 
+
+
 /**OPENGL LIB**/
 #include <GL/glew.h>
 #include <GL/freeglut.h>
@@ -51,7 +53,11 @@ typedef glm::vec4 vec4;
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/features2d.hpp>
+#include "opencv2/cudaimgproc.hpp"
+#include "opencv2/cudafeatures2d.hpp"
 
+
+using namespace cv;
 //Los parametros predefinidos para los datos
 #define FrameWidth 640
 #define FrameHeight 480

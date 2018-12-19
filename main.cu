@@ -14,12 +14,8 @@ usar temporalmente sudo ./app
 #include "src/loadshader.h"
 #include "src/dataset.h"
 #include "src/image.h"
-// #include "posegraph.h"
 #include "src/odometry.h"
 #include "src/volumeintegrator.h"
-#include <iostream>
-
-using namespace std;
 
 //#define DATABASE_NAME "data/burghers_sample_png"
 //#define DATABASE_NAME "data/cactusgarden_png"
@@ -27,6 +23,7 @@ using namespace std;
 
 //#define intrinsics Cam_Defaults
 #define intrinsics Cam_Sturm2012_fr1
+
 
 // Seleccionamos los frames que vamos a procesar
 float speed = 0.01f;
@@ -237,25 +234,13 @@ void mouseMotion(int x, int y){
 
 
 int main(int argc, char** argv){
-    // float* vec = vec3_array<float>(4);
-    // at_vec3(vec, 1, 0) = 0;
-    // at_vec3(vec, 1, 1) = 1;
-    // at_vec3(vec, 1, 2) = 2;
-    // float* temp = vec3_i<float>(vec, 1);
-    //
-    // cout<<at_vec3(vec, 1, 0)<<endl;
-    // cout<<temp[0]<<endl;
-    // cout<<temp[1]<<endl;
-    // cout<<temp[2]<<endl;
-
-
     // Obtener From-->To Frames
     int from = std::atoi(argv[1]);
     int to = std::atoi(argv[2]);
     cout << from << to <<endl;
 
     // Lectura y Procesamiento de Datos con OpenCV
-    std::srand( unsigned( NULL ));
+    std::srand( 0);
     //Parte del calculo de OpenCV
     DataSet myDataSet(DATABASE_NAME);
 

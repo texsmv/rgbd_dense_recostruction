@@ -3,7 +3,7 @@
 
 #include "includes.h"
 
-
+//Clase que se encarga de leer los archivos de Texto depth.txt y rgb.txt
 class DataSet
 {
 private:
@@ -21,4 +21,4 @@ public:
 
 };
 
-#endif
+#endif // DATASET_H

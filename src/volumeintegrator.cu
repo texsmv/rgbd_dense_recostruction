@@ -14,8 +14,26 @@ VolumeIntegrator::VolumeIntegrator(Odometry &source)
     //Extraemos los PointClouds para cada frame
     for(int i = 0; i < n ; i++)
         PointClouds.push_back(source.getImage(i).getGLPointCloud());
+    //Verifiquemos el contenido
+    /**
+    for(int i = 10000 ; i < 50000;i++){
+        auto p = PointClouds[0].Points[i];
+        cout << "(" << p.x << "," <<
+                p.y << "," <<
+              vec4 p = vec4(target.getPointFromPointCloud(k),1.0);
+              p.z << ")";
+    } cout << endl;
+    **/
 
 
+    //Extraemos las matrices de Transformacion (n-1) matrices
+    //Calculamos las Matrices verdaderas
+    //Recordemos que las transformaciones  hasta ahora fueron calculadas entre pares
+    // y q ellas alineaban un Target Frame a un Source Frame
+    // luego para hallar la i esima matriz, debemos "acumular"(multiplicar) estas matrices
+    // pero en Sentido Inverso es Podemos pensarlo como una forma recursiva
+    // T_0 = T_0
+    // T_k = T_k-1 * T'_k
     Transformations.resize(n-1);
     Transformations[0] = source.getTransformation(0); //Matriz base
     //cout << "Eigen transfor: " << endl << Transformations[0] << endl;
@@ -23,7 +41,7 @@ VolumeIntegrator::VolumeIntegrator(Odometry &source)
     for(int i = 1; i < n-1  ; i++)
         Transformations[i] = Transformations[i-1] * source.getTransformation(i);
         //Transformations[i] = source.getTransformation(i);
-        
+
     //Insertamos una matrix identidad al principio de nuestras transformaciones
     //para emparejar nuestros vectores y hacer bucles mas facil
     Transformations.insert(Transformations.begin(),Eigen::Matrix4d::Identity());

@@ -5,8 +5,6 @@
 #include "camera.h"
 #include "dataset.h"
 #include "pointcloud.h"
-#include "structures.h"
-#include "funciones_cuda.h"
 
 /**
     Image, es el objeto que contiene i-esimo Par de Imagenes RGB-D respecto de un dataset

@@ -14,4 +14,5 @@ void uniformRegister(vec3 var,GLuint shaderID,const char * string);
 void uniformRegister(GLfloat var,GLuint shaderID,const char * string);
 void uniformRegister(GLint var,GLuint shaderID,const char * string);
 void printMatrix(mat4 matrix);
+
 #endif

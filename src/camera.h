@@ -4,6 +4,7 @@
 
 enum CameraType{Cam_Defaults, Cam_Sturm2012_fr1};
 
+//Class Camera Intrinsic Properties
 class Camera
 {
 public:
@@ -12,7 +13,7 @@ public:
     //Camera Parameters
     float fx = 525.0,fy = 525.0;
     float cx = 319.5, cy = 239.5;
-    float depthFactor = 1000.0;
+    float depthFactor = 1000.0; // How many values are scaled to 1m
 };
 
-#endif
+#endif // CAMERA_H

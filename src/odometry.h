@@ -35,9 +35,9 @@ public:
 // Implementar
 Eigen::Matrix4d ComputeOdometry(Image &source, Image &target);
 
-// Realiza Feature Matching entre dos imagenes
+// Realiza Feature GpuMatching entre dos imagenes
 // Devuelve una dupla que son todas correspondencias de los Features
-// Matching vector Composition
+// GpuMatching vector Composition
 // source_pixel(u,v),target_pixel(u,v)
 std::vector<cv::DMatch> computeFeatureMatches(const cv::Mat &source,std::vector<cv::KeyPoint>& keypoints_s, const cv::Mat &target,std::vector<cv::KeyPoint>& keypoints_t);
 

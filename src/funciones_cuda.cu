@@ -2,12 +2,12 @@
 
 __global__ void fillPoints(uint16_t* pSource, float* puntos, float depthFactor, float cx, float cy, float fx, float fy, int h, int w){
 
-  int u = blockIdx.x * blockDim.x + threadIdx.x;
-  int v = blockIdx.y * blockDim.y + threadIdx.y;
+  int v = blockIdx.x * blockDim.x + threadIdx.x;
+  int u = blockIdx.y * blockDim.y + threadIdx.y;
 
   if(u < w && v < h){
-    int i = u + v * w;
-    uint16_t value = pSource[i];
+    int i = v + u * w;
+    float value = pSource[i];
     if(value != 0){
       float pz = value / depthFactor;
       at_vec3(puntos, i, 2) = pz;
