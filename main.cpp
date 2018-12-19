@@ -4,6 +4,14 @@
 #include "src/image.h"
 #include "src/odometry.h"
 #include "src/volumeintegrator.h"
+#include <pcl/point_types.h>
+#include <pcl/io/pcd_io.h>
+#include <pcl/kdtree/kdtree_flann.h>
+#include <pcl/features/normal_3d.h>
+#include <pcl/surface/gp3.h>
+#include <pcl/visualization/pcl_visualizer.h>
+#include <pcl/io/pcd_io.h>
+#include <pcl/io/vtk_io.h>
 
 //#define DATABASE_NAME "data/burghers_sample_png"
 //#define DATABASE_NAME "data/cactusgarden_png"
