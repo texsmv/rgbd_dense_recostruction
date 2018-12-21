@@ -141,7 +141,7 @@ Eigen::Matrix4d ComputeOdometry(Image &source, Image &target)
         //FOR(i,3){
         //    printEigenVector(coord_s[ indices[i] ]);printEigenVector(coord_t[ indices[i] ]);cout << "======================\n";
         //}
-        error = AvgError(coord_s,coord_t);
+        // error = AvgError(coord_s,coord_t);
         //cout << "\nError Promedio: " << error << endl << endl;
 
         // Actualizamos los valores para la siguiente iteracion
@@ -215,7 +215,6 @@ std::vector<cv::DMatch> computeFeatureMatches(const cv::Mat &source,std::vector<
     // cv::Ptr<cv::FeatureDetector> orb = cuda::ORB::create(); // al crearlo con opencv3 orb es un puntero cambiar sus llamadas para  usar -> en ves de puntos
     cv::Ptr<cv::cuda::ORB> orb = cv::cuda::ORB::create();
 
-    cout<<"adas"<<endl;
     orb->detect(source_d,keypoints_s);
     orb->detect(target_d,keypoints_t);
 
@@ -223,7 +222,6 @@ std::vector<cv::DMatch> computeFeatureMatches(const cv::Mat &source,std::vector<
     // orb->detect(target,keypoints_t);
 
 
-    cout<<"adas"<<endl;
 
     orb->compute(source_d,keypoints_s,descriptor_s_d);
     orb->compute(target_d,keypoints_t,descriptor_t_d);
@@ -233,11 +231,9 @@ std::vector<cv::DMatch> computeFeatureMatches(const cv::Mat &source,std::vector<
 
     // orb->detectAndCompute(source_d, noArray(), keypoints_s,descriptor_s_d, true);
     // orb->detectAndCompute(target_d, noArray(), keypoints_t,descriptor_t_d, true);
-    cout<<"adas"<<endl;
-    descriptor_s_d.download(descriptor_s);
-    descriptor_t_d.download(descriptor_t);
+    // descriptor_s_d.download(descriptor_s);
+    // descriptor_t_d.download(descriptor_t);
 
-    cout<<"adas"<<endl;
 
     // Feature Matching using FLANN (Kd-Trees)
     // Referirse a la documentacion de OpenCV
@@ -260,7 +256,6 @@ std::vector<cv::DMatch> computeFeatureMatches(const cv::Mat &source,std::vector<
 
     // cout<<"adasasas"<<endl;
     // matcher.match(descriptor_s,descriptor_t,matches);
-    cout<<"adasasaass"<<endl;
 
     /**
     //Calculamos los valores maximos y minimos
@@ -288,7 +283,7 @@ std::vector<cv::DMatch> computeFeatureMatches(const cv::Mat &source,std::vector<
 
     cv::imshow("features Matches",img_matches);
 
-    cv::waitKey(500);
+    cv::waitKey(200);
 
     return matches;
 }

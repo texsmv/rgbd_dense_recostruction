@@ -15,7 +15,8 @@
 
 //#define DATABASE_NAME "data/burghers_sample_png"
 //#define DATABASE_NAME "data/cactusgarden_png"
-#define DATABASE_NAME "data/rgbd_dataset_freiburg1_room"
+// #define DATABASE_NAME "data/rgbd_dataset_freiburg1_room"
+#define DATABASE_NAME "data/rgbd_dataset_freiburg1_360"
 
 //#define intrinsics Cam_Defaults
 #define intrinsics Cam_Sturm2012_fr1
@@ -233,6 +234,7 @@ int main(int argc, char** argv){
     // Obtener From-->To Frames
     int from = std::atoi(argv[1]);
     int to = std::atoi(argv[2]);
+    string mode_arg = argv[3];
     cout << from << to <<endl;
 
     // Lectura y Procesamiento de Datos con OpenCV
@@ -259,11 +261,14 @@ int main(int argc, char** argv){
 
     //integrator->GenerateGLGeometry(cubes,16);
 
-
     int mode = points;
 
+    if (mode_arg == "lines") mode = lines;
+    else if (mode_arg == "cubes") mode = cubes;
+    else mode = points;
+
     integrator = new VolumeIntegrator(&myDataSet,from,to,intrinsics);
-    
+
     integrator->GenerateGLGeometry(mode,14);
 
 
@@ -307,7 +312,7 @@ int main(int argc, char** argv){
         for_i(cloud->points.size())
         {
             cloud->points[i].x = Points[i].x; cloud->points[i].y = Points[i].y; cloud->points[i].z = Points[i].z;
-            cloud->points[i].r = Colors[i].x*255.0f; cloud->points[i].g = Colors[i].y*255.0f; cloud->points[i].b = Colors[i].z*255.0f; 
+            cloud->points[i].r = Colors[i].x*255.0f; cloud->points[i].g = Colors[i].y*255.0f; cloud->points[i].b = Colors[i].z*255.0f;
         }
 
         pcl::io::savePCDFileBinary("pointcloud.pcd", *cloud);

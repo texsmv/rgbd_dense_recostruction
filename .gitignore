@@ -1,3 +1,7 @@
 *.o
 app
 data
+CMake*
+cmake*
+*.vtk
+*.pcd
